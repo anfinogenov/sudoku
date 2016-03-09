@@ -116,6 +116,8 @@ void advanced_generator_v2 (sudoku_t & field)
     TODO: idea is to generate numbers not as before randomely, but
     generate numbers in row - 9 '1', 9 '2', so it will solve a
     problem with unique checker on last column
+
+    ^ It does not work
     */
 }
 
