@@ -113,6 +113,8 @@ void advanced_generator_v2 (sudoku_t & field)
     }
 }
 
+//TODO: генерировать поле поквадратно
+
 /*
 void generate(sudoku_t & field)
 {
