@@ -72,15 +72,15 @@ void advanced_generator_v3 (sudoku_t & field)
         for (int j = 0; j < 9; j++)
             field.array[i][j] = 0; // inits field with zeros
 
-    for (int i = 0; i < 9; i += 3)
-        for (int j = 0; j < 9; j += 3)
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
             for (int m = 0; m < 3; m++)
                 for (int n = 0; n < 3;)
                 {
                     int temp_rand = rand()%9 + 1;
-                    if(uniqueCheck(field, i+m, j+n, temp_rand))
+                    if(uniqueCheck(field, (i*3)+m, (j*3)+n, temp_rand))
                     {
-                        field.array[i+m][j+n] = temp_rand;
+                        field.array[i*3+m][j*3+n] = temp_rand;
                         n++;
                     }
                     system("clear");
