@@ -26,6 +26,10 @@ void print(sudoku_t field)
     }
 }
 
+//TODO: Change var names in uniqueCheck function
+//TODO: Add nev function like "no available number for point with x,y", that
+//means that generation failed
+
 bool uniqueCheck(sudoku_t field, int x, int y, int number)
 //checks, if there are any contradictions with sudoku logic
 {
