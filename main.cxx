@@ -2,6 +2,8 @@
 #include <ctime>
 #include <cstdlib>
 
+const bool debug = 1;
+
 using namespace std;
 
 typedef struct sudoku_t {
@@ -23,26 +25,6 @@ void print(sudoku_t field)
         if (++counterLine%3 == 0) cout << endl;
     }
 }
-
-/*
-void str_generator (sudoku_t & field, int num)
-{
-    int temp[9] = {};
-
-    for (int i = 0; i < 9; i++) temp[i] = i+1; //fills temp array with 1..9
-
-    for (int i = 0; i < 9; i++)
-    {
-        int temp_rand = rand()%9;
-        if (temp[temp_rand] != 0)
-        {
-            field.array[num][i] = temp[temp_rand];
-            temp[temp_rand] = 0;
-        }
-        else i--;
-    }
-}
-*/
 
 bool uniqueCheck(sudoku_t field, int x, int y, int number)
 //checks, if there are any contradictions with sudoku logic
@@ -83,75 +65,14 @@ void advanced_generator_v3 (sudoku_t & field)
                         field.array[i*3+m][j*3+n] = temp_rand;
                         n++;
                     }
-                    system("clear");
-                    print(field);
+                    if(debug)
+                    {
+                        system("clear");
+                        print(field);
+                    }
                 }
 
 }
-
-/*
-void advanced_generator (sudoku_t & field)
-{
-    srand(time(NULL));
-    for (int i = 0; i < 9; i++)
-        for (int j = 0; j < 9; j++)
-            field.array[i][j] = 0;
-
-    for (int i = 0; i < 9; i++)
-    {
-        for (int j = 0; j < 9; j++)
-        {
-            int temp_rand = rand()%9 + 1;
-            if (uniqueCheck(field, i, j, temp_rand))
-                field.array[i][j] = temp_rand;
-            else j--;
-            //system("clear");
-            //print(field);
-        }
-    }
-}
-*/
-
-/* j
-void advanced_generator_v2 (sudoku_t & field)
-{
-    srand(time(NULL));
-    for (int i = 0; i < 9; i++)
-        for (int j = 0; j < 9; j++)
-            field.array[i][j] = 0; //fills field with zeros
-
-    int counter = 1;
-    for (int n = 1; n <= 9;)
-    {
-        int i = rand()%9;
-        int j = rand()%9;
-        if (uniqueCheck(field, i, j, n) && (field.array[i][j] == 0))
-        {
-            field.array[i][j] = n;
-            counter++;
-        }
-        if (counter == 9)
-        {
-            n++;
-            counter = 1;
-        }
-        system("clear");
-        print(field);
-    }
-}
-*/
-
-//TODO: генерировать поле поквадратно
-
-/*
-void generate(sudoku_t & field)
-{
-    srand(time(NULL));
-    for (int i = 0; i < 9; i++) str_generator(field, i);
-}
-*/
-
-
 
 int main()
 {
