@@ -46,30 +46,33 @@ bool uniqueCheck(sudoku_t field, int x, int y, int number)
     return true;
 }
 
-void advanced_generator_v3 (sudoku_t & field)
+void generator (sudoku_t & field)
 {
     srand(time(NULL));
 
-    for (int i = 0; i < 9; i++)
-        for (int j = 0; j < 9; j++)
-            field.array[i][j] = 0; // inits field with zeros
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
+            field.array[coord_x][coord_y] = 0; // inits field with zeros
 
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            for (int m = 0; m < 3; m++)
-                for (int n = 0; n < 3;)
+    //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
+
+    for (int outer_x = 0; outer_x < 3; outer_x++)
+        for (int outer_y = 0; outer_y < 3; outer_y++)
+            for (int inner_x = 0; inner_x < 3; inner_x++)
+                for (int inner_y = 0; inner_y < 3;) //4 loops for square
                 {
+                    int coord_x = outer_x*3 + inner_x;
+                    int coord_y = outer_y*3 + inner_y;
+
                     int temp_rand = rand()%9 + 1;
-                    if(uniqueCheck(field, (i*3)+m, (j*3)+n, temp_rand))
+                    if(uniqueCheck(field, coord_x, coord_y, temp_rand))
                     {
-                        field.array[i*3+m][j*3+n] = temp_rand;
-                        n++;
+                        field.array[coord_x][coord_y] = temp_rand;
+                        inner_y++;
                     }
-                    if(debug)
-                    {
-                        system("clear");
-                        print(field);
-                    }
+
+                    if(debug) { system("clear"); print(field); }
+                    //prints full field after every generation step
                 }
 
 }
@@ -77,7 +80,7 @@ void advanced_generator_v3 (sudoku_t & field)
 int main()
 {
     sudoku_t field;
-    advanced_generator_v3(field);
+    generator(field);
     print(field);
 
     return 0;
