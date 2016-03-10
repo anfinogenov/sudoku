@@ -45,22 +45,48 @@ void str_generator (sudoku_t & field, int num)
 */
 
 bool uniqueCheck(sudoku_t field, int x, int y, int number)
+//checks, if there are any contradictions with sudoku logic
 {
-    for (int j = 0; j < 9; j++) //string
+    for (int j = 0; j < 9; j++) //string checker
         if (field.array[x][j] == number) return false;
 
-    for (int i = 0; i < 9; i++) //column
+    for (int i = 0; i < 9; i++) //column checker
         if (field.array[i][y] == number) return false;
 
-    { //square
-        int i = x-x%3;
-        int j = y-y%3;
-        for (int m = 0; m < 3; m++) //three times row
-            for (int n = 0; n < 3; n++) //three times col
+    { //square checker (little tricky move to check 9 field squares 3*3)
+        int i = x - x%3;
+        int j = y - y%3;
+        for (int m = 0; m < 3; m++) //three times row from x
+            for (int n = 0; n < 3; n++) //three times col from y
                 if (field.array[i+m][j+n] == number)
                     return false;
     }
     return true;
+}
+
+void advanced_generator_v3 (sudoku_t & field)
+{
+    srand(time(NULL));
+
+    for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+            field.array[i][j] = 0; // inits field with zeros
+
+    for (int i = 0; i < 9; i += 3)
+        for (int j = 0; j < 9; j += 3)
+            for (int m = 0; m < 3; m++)
+                for (int n = 0; n < 3;)
+                {
+                    int temp_rand = rand()%9 + 1;
+                    if(uniqueCheck(field, i+m, j+n, temp_rand))
+                    {
+                        field.array[i+m][j+n] = temp_rand;
+                        n++;
+                    }
+                    system("clear");
+                    print(field);
+                }
+
 }
 
 /*
@@ -79,13 +105,14 @@ void advanced_generator (sudoku_t & field)
             if (uniqueCheck(field, i, j, temp_rand))
                 field.array[i][j] = temp_rand;
             else j--;
-            system("clear");
-            print(field);
+            //system("clear");
+            //print(field);
         }
     }
 }
 */
 
+/* j
 void advanced_generator_v2 (sudoku_t & field)
 {
     srand(time(NULL));
@@ -112,6 +139,7 @@ void advanced_generator_v2 (sudoku_t & field)
         print(field);
     }
 }
+*/
 
 //TODO: генерировать поле поквадратно
 
@@ -128,7 +156,7 @@ void generate(sudoku_t & field)
 int main()
 {
     sudoku_t field;
-    advanced_generator_v2(field);
+    advanced_generator_v3(field);
     print(field);
 
     return 0;
