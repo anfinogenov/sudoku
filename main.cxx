@@ -26,24 +26,23 @@ void print(sudoku_t field)
     }
 }
 
-//TODO: Change var names in uniqueCheck function
-
-bool uniqueCheck(sudoku_t field, int x, int y, int number)
+bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
 //checks, if there are any contradictions with sudoku logic
 {
-    for (int j = 0; j < 9; j++) //string checker
-        if (field.array[x][j] == number) return false;
+    for (int coord_y = 0; coord_y < 9; coord_y++) //column checker
+        if (field.array[input_x][coord_y] == number) return false;
 
-    for (int i = 0; i < 9; i++) //column checker
-        if (field.array[i][y] == number) return false;
+    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
+        if (field.array[coord_x][input_y] == number) return false;
 
     { //square checker (little tricky move to check 9 field squares 3*3)
-        int i = x - x%3;
-        int j = y - y%3;
-        for (int m = 0; m < 3; m++) //three times row from x
-            for (int n = 0; n < 3; n++) //three times col from y
-                if (field.array[i+m][j+n] == number)
-                    return false;
+        int sq_coord_x = input_x - input_x%3;
+        int sq_coord_y = input_y - input_y%3;
+        for (int inner_x = 0; inner_x < 3; inner_x++) //three times row from x
+            for (int inner_y = 0; inner_y < 3; inner_y++) //three times col from y
+                if (number != 0)
+                    if (field.array[sq_coord_x + inner_x][sq_coord_y + inner_y] == number)
+                        return false;
     }
     return true;
 }
