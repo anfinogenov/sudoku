@@ -27,8 +27,6 @@ void print(sudoku_t field)
 }
 
 //TODO: Change var names in uniqueCheck function
-//TODO: Add nev function like "no available number for point with x,y", that
-//means that generation failed
 
 bool uniqueCheck(sudoku_t field, int x, int y, int number)
 //checks, if there are any contradictions with sudoku logic
@@ -50,6 +48,16 @@ bool uniqueCheck(sudoku_t field, int x, int y, int number)
     return true;
 }
 
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
+//checks, if there is a generation failure
+{
+    /*
+    for (int i = 1; i <= 9; i++)
+        if (!uniqueCheck(field, coord_x, coord_y, i)) return true; //does not work
+    */
+    return false;
+}
+
 void generator (sudoku_t & field)
 {
     srand(time(NULL));
@@ -68,14 +76,20 @@ void generator (sudoku_t & field)
                     int coord_x = outer_x*3 + inner_x;
                     int coord_y = outer_y*3 + inner_y;
 
+                    if (generationFailureCheck(field, coord_x, coord_y))
+                    {
+                        cout << "generation failed\n";
+                        exit(-1);
+                    }
+
                     int temp_rand = rand()%9 + 1;
-                    if(uniqueCheck(field, coord_x, coord_y, temp_rand))
+                    if (uniqueCheck(field, coord_x, coord_y, temp_rand))
                     {
                         field.array[coord_x][coord_y] = temp_rand;
                         inner_y++;
                     }
 
-                    if(debug) { system("clear"); print(field); }
+                    if (debug) { system("clear"); print(field); }
                     //prints full field after every generation step
                 }
 
