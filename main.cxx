@@ -3,12 +3,93 @@
 #include <cstdlib>
 
 const bool debug = 1;
+const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 using namespace std;
 
 typedef struct sudoku_t {
     int array[9][9];
 } sudoku_t;
+
+bool generator (sudoku_t & field);
+int  generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
+void print (sudoku_t field);
+bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
+
+bool generator (sudoku_t & field)
+{
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
+            field.array[coord_x][coord_y] = 0; // inits field with zeros
+
+    //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
+
+    for (int outer_x = 0; outer_x < 3; outer_x++)
+        for (int outer_y = 0; outer_y < 3; outer_y++)
+            if (generateSquare3x3(field, outer_x*3, outer_y*3) == 1)
+                return true;
+    return false;
+}
+
+int generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
+{
+    for (int inner_x = 0; inner_x < 3; inner_x++) //inner square coordinates
+        for (int inner_y = 0; inner_y < 3;)
+        {
+            int coord_x = sq_coord_x + inner_x;
+            int coord_y = sq_coord_y + inner_y;
+
+            if (generationFailureCheck(field, coord_x, coord_y))
+            {
+                return 1;
+            }
+
+            int temp_rand = rand()%9 + 1;
+            if (uniqueCheck(field, coord_x, coord_y, temp_rand))
+            {
+                field.array[coord_x][coord_y] = temp_rand;
+                inner_y++;
+            }
+
+            if (debug) { system("clear"); print(field); }
+            //prints full field after every generation step
+        }
+    return 0;
+}
+
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
+//checks, if there is a generation failure
+{
+    bool failure = false;
+    for (int i = 0; i < 9; i++)
+    {
+        failure = failure | uniqueCheck(field, coord_x, coord_y, numbers1to9[i]); //magic
+        if (failure) break;
+    }
+    return !failure;
+}
+
+bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
+//checks, if there are any contradictions with sudoku logic
+{
+    for (int coord_y = 0; coord_y < 9; coord_y++) //column checker
+        if (field.array[input_x][coord_y] == number) return false;
+
+    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
+        if (field.array[coord_x][input_y] == number) return false;
+
+    { //square checker (little tricky move to check 9 field squares 3*3)
+        int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord
+        int sq_coord_y = input_y - input_y%3; //parse 0 or 3 or 6 from input coord
+        for (int inner_x = 0; inner_x < 3; inner_x++) //three times right from sq_coord_x
+            for (int inner_y = 0; inner_y < 3; inner_y++) //three times down from sq_coord_y
+                if (number != 0)
+                    if (field.array[sq_coord_x + inner_x][sq_coord_y + inner_y] == number)
+                        return false;
+    }
+    return true;
+}
 
 void print(sudoku_t field)
 {
@@ -26,65 +107,15 @@ void print(sudoku_t field)
     }
 }
 
-//TODO: Change var names in uniqueCheck function
-//TODO: Add nev function like "no available number for point with x,y", that
-//means that generation failed
-
-bool uniqueCheck(sudoku_t field, int x, int y, int number)
-//checks, if there are any contradictions with sudoku logic
-{
-    for (int j = 0; j < 9; j++) //string checker
-        if (field.array[x][j] == number) return false;
-
-    for (int i = 0; i < 9; i++) //column checker
-        if (field.array[i][y] == number) return false;
-
-    { //square checker (little tricky move to check 9 field squares 3*3)
-        int i = x - x%3;
-        int j = y - y%3;
-        for (int m = 0; m < 3; m++) //three times row from x
-            for (int n = 0; n < 3; n++) //three times col from y
-                if (field.array[i+m][j+n] == number)
-                    return false;
-    }
-    return true;
-}
-
-void generator (sudoku_t & field)
-{
-    srand(time(NULL));
-
-    for (int coord_x = 0; coord_x < 9; coord_x++)
-        for (int coord_y = 0; coord_y < 9; coord_y++)
-            field.array[coord_x][coord_y] = 0; // inits field with zeros
-
-    //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
-
-    for (int outer_x = 0; outer_x < 3; outer_x++)
-        for (int outer_y = 0; outer_y < 3; outer_y++)
-            for (int inner_x = 0; inner_x < 3; inner_x++)
-                for (int inner_y = 0; inner_y < 3;) //4 loops for square
-                {
-                    int coord_x = outer_x*3 + inner_x;
-                    int coord_y = outer_y*3 + inner_y;
-
-                    int temp_rand = rand()%9 + 1;
-                    if(uniqueCheck(field, coord_x, coord_y, temp_rand))
-                    {
-                        field.array[coord_x][coord_y] = temp_rand;
-                        inner_y++;
-                    }
-
-                    if(debug) { system("clear"); print(field); }
-                    //prints full field after every generation step
-                }
-
-}
-
 int main()
 {
+    srand(time(NULL));
     sudoku_t field;
-    generator(field);
+    bool gen = true;
+    while (gen)
+    {
+        gen = generator(field);
+    }
     print(field);
 
     return 0;
