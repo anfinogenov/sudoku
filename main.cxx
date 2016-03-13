@@ -13,10 +13,50 @@ typedef struct sudoku_t {
 
 void generator (sudoku_t & field);
 void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
-bool generationFailureCheck (sudoku_t field, int sq_coord_x, int sq_coord_y, int inner_x, int inner_y);
-void getNumbersFromSquare(int* numbers_array, sudoku_t field, int sq_coord_x, int sq_coord_y);
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
 void print(sudoku_t field);
 bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number);
+
+void generator (sudoku_t & field)
+{
+    srand(time(NULL));
+
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
+            field.array[coord_x][coord_y] = 0; // inits field with zeros
+
+    //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
+
+    for (int outer_x = 0; outer_x < 3; outer_x++)
+        for (int outer_y = 0; outer_y < 3; outer_y++)
+            generateSquare3x3(field, outer_x*3, outer_y*3);
+}
+
+void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
+{
+    for (int inner_x = 0; inner_x < 3; inner_x++) //inner square coordinates
+        for (int inner_y = 0; inner_y < 3;)
+        {
+            int coord_x = sq_coord_x + inner_x;
+            int coord_y = sq_coord_y + inner_y;
+
+            if (generationFailureCheck(field, coord_x, coord_y))
+            {
+                cout << "generation failed\n";
+                exit(-1);
+            }
+
+            int temp_rand = rand()%9 + 1;
+            if (uniqueCheck(field, coord_x, coord_y, temp_rand))
+            {
+                field.array[coord_x][coord_y] = temp_rand;
+                inner_y++;
+            }
+
+            if (debug) { system("clear"); print(field); }
+            //prints full field after every generation step
+        }
+}
 
 void print(sudoku_t field)
 {
@@ -55,79 +95,15 @@ bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
     return true;
 }
 
-int compare (const void * x1, const void * x2)
-{
-    return (*(int*)x1 - *(int*)x2);
-}
-
-void getNumbersFromSquare(int* numbers_array, sudoku_t field, int sq_coord_x, int sq_coord_y)
-{
-    int i = 0;
-    for (int inner_x = 0; inner_x < 3; inner_x++)
-        for (int inner_y = 0; inner_y < 3; inner_y++)
-        {
-            numbers_array[i] = field.array[sq_coord_x + inner_x][sq_coord_y + inner_y];
-            i++;
-        }
-    qsort(numbers_array, 9, sizeof(int), compare);
-}
-
-bool generationFailureCheck (sudoku_t field, int sq_coord_x, int sq_coord_y, int inner_x, int inner_y)
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
 //checks, if there is a generation failure
 {
-    /*
-    for (int i = 1; i <= 9; i++)
-        if (!uniqueCheck(field, coord_x, coord_y, i)) return true; //does not work
-        field, sq_coord_x, sq_coord_y, inner_x, inner_y
-    */
-
-    int numbers[9];
-    getNumbersFromSquare(numbers, field, sq_coord_x, sq_coord_y);
-    //this func will return sorted array of already placed numbers in square
-
-
-    return false;
-}
-
-void generator (sudoku_t & field)
-{
-    srand(time(NULL));
-
-    for (int coord_x = 0; coord_x < 9; coord_x++)
-        for (int coord_y = 0; coord_y < 9; coord_y++)
-            field.array[coord_x][coord_y] = 0; // inits field with zeros
-
-    //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
-
-    for (int outer_x = 0; outer_x < 3; outer_x++)
-        for (int outer_y = 0; outer_y < 3; outer_y++)
-            generateSquare3x3(field, outer_x, outer_y);
-}
-
-void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
-{
-    for (int inner_x = 0; inner_x < 3; inner_x++) //inner square coordinates
-        for (int inner_y = 0; inner_y < 3;)
-        {
-            int coord_x = sq_coord_x*3 + inner_x;
-            int coord_y = sq_coord_y*3 + inner_y;
-
-            if (generationFailureCheck(field, sq_coord_x, sq_coord_y, inner_x, inner_y))
-            {
-                cout << "generation failed\n";
-                exit(-1);
-            }
-
-            int temp_rand = rand()%9 + 1;
-            if (uniqueCheck(field, coord_x, coord_y, temp_rand))
-            {
-                field.array[coord_x][coord_y] = temp_rand;
-                inner_y++;
-            }
-
-            if (debug) { system("clear"); print(field); }
-            //prints full field after every generation step
-        }
+    bool failure = false;
+    for (int i = 0; i < 9; i++)
+    {
+        failure = failure | uniqueCheck(field, coord_x, coord_y, numbers1to9[i]);
+    }
+    return !failure;
 }
 
 int main()
