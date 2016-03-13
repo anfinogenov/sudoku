@@ -2,7 +2,7 @@
 #include <ctime>
 #include <cstdlib>
 
-const bool debug = 1;
+const bool debug = 0;
 const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 using namespace std;
