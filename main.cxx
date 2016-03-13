@@ -11,16 +11,14 @@ typedef struct sudoku_t {
     int array[9][9];
 } sudoku_t;
 
-void generator (sudoku_t & field);
-void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
+bool generator (sudoku_t & field);
+int  generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
 bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
-void print(sudoku_t field);
-bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number);
+void print (sudoku_t field);
+bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
 
-void generator (sudoku_t & field)
+bool generator (sudoku_t & field)
 {
-    srand(time(NULL));
-
     for (int coord_x = 0; coord_x < 9; coord_x++)
         for (int coord_y = 0; coord_y < 9; coord_y++)
             field.array[coord_x][coord_y] = 0; // inits field with zeros
@@ -29,10 +27,12 @@ void generator (sudoku_t & field)
 
     for (int outer_x = 0; outer_x < 3; outer_x++)
         for (int outer_y = 0; outer_y < 3; outer_y++)
-            generateSquare3x3(field, outer_x*3, outer_y*3);
+            if (generateSquare3x3(field, outer_x*3, outer_y*3) == 1)
+                return true;
+    return false;
 }
 
-void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
+int generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
 {
     for (int inner_x = 0; inner_x < 3; inner_x++) //inner square coordinates
         for (int inner_y = 0; inner_y < 3;)
@@ -42,8 +42,7 @@ void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
 
             if (generationFailureCheck(field, coord_x, coord_y))
             {
-                cout << "generation failed\n";
-                exit(-1);
+                return 1;
             }
 
             int temp_rand = rand()%9 + 1;
@@ -56,22 +55,19 @@ void generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
             if (debug) { system("clear"); print(field); }
             //prints full field after every generation step
         }
+    return 0;
 }
 
-void print(sudoku_t field)
+bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
+//checks, if there is a generation failure
 {
-    int counterLine = 0;
-    int counterCol = 0;
+    bool failure = false;
     for (int i = 0; i < 9; i++)
     {
-        for (int j = 0; j < 9; j++)
-        {
-            cout << field.array[i][j] << " ";
-            if (++counterCol%3 == 0) cout << "\t";
-        }
-        cout << endl;
-        if (++counterLine%3 == 0) cout << endl;
+        failure = failure | uniqueCheck(field, coord_x, coord_y, numbers1to9[i]); //magic
+        if (failure) break;
     }
+    return !failure;
 }
 
 bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
@@ -95,21 +91,31 @@ bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
     return true;
 }
 
-bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
-//checks, if there is a generation failure
+void print(sudoku_t field)
 {
-    bool failure = false;
+    int counterLine = 0;
+    int counterCol = 0;
     for (int i = 0; i < 9; i++)
     {
-        failure = failure | uniqueCheck(field, coord_x, coord_y, numbers1to9[i]);
+        for (int j = 0; j < 9; j++)
+        {
+            cout << field.array[i][j] << " ";
+            if (++counterCol%3 == 0) cout << "\t";
+        }
+        cout << endl;
+        if (++counterLine%3 == 0) cout << endl;
     }
-    return !failure;
 }
 
 int main()
 {
+    srand(time(NULL));
     sudoku_t field;
-    generator(field);
+    bool gen = true;
+    while (gen)
+    {
+        gen = generator(field);
+    }
     print(field);
 
     return 0;
