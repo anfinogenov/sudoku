@@ -11,6 +11,7 @@ typedef struct sudoku_t {
     int array[9][9];
 } sudoku_t;
 
+void fieldInit (sudoku_t & field);
 bool generator (sudoku_t & field);
 bool generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
 bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
