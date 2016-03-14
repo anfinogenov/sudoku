@@ -16,8 +16,6 @@ bool generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
 bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
 void print (sudoku_t field);
 bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
-bool strCheck (sudoku_t field, int coord_str, int number);
-bool colCheck (sudoku_t field, int coord_col, int number);
 
 void fieldInit (sudoku_t & field)
 {
@@ -79,8 +77,13 @@ bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
 bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
 //checks, if there are any contradictions with sudoku logic
 {
-    if (!strCheck(field, input_x, number)) return false;
-    if (!colCheck(field, input_y, number)) return false;
+    for (int coord_y = 0; coord_y < 9; coord_y++) //string checker
+        if (field.array[input_x][coord_y] == number) return false;
+        //if number already exists in string returns false;
+
+    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
+        if (field.array[coord_x][input_y] == number) return false;
+        //if number already exists in column returns false;
 
     { //square checker
         int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord X
@@ -91,22 +94,6 @@ bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
                     if (field.array[sq_coord_x + inner_x][sq_coord_y + inner_y] == number)
                         return false;
     }
-    return true;
-}
-
-bool strCheck (sudoku_t field, int coord_str, int number)
-{
-    for (int coord_y = 0; coord_y < 9; coord_y++) //string checker
-        if (field.array[coord_str][coord_y] == number) return false;
-        //if number already exists in string returns false;
-    return true;
-}
-
-bool colCheck (sudoku_t field, int coord_col, int number)
-{
-    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
-        if (field.array[coord_x][coord_col] == number) return false;
-        //if number already exists in column returns false;
     return true;
 }
 
