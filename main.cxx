@@ -17,14 +17,18 @@ bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
 void print (sudoku_t field);
 bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
 
-bool generator (sudoku_t & field)
+void fieldInit (sudoku_t & field)
 {
     for (int coord_x = 0; coord_x < 9; coord_x++)
         for (int coord_y = 0; coord_y < 9; coord_y++)
             field.array[coord_x][coord_y] = 0; // inits field with zeros
+}
+
+bool generator (sudoku_t & field) //this function generates field by squares
+{
+    fieldInit (field);
 
     //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
-
     for (int outer_x = 0; outer_x < 3; outer_x++)
         for (int outer_y = 0; outer_y < 3; outer_y++)
             if (generateSquare3x3(field, outer_x*3, outer_y*3) == 1)
@@ -79,12 +83,12 @@ bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
     for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
         if (field.array[coord_x][input_y] == number) return false;
 
-    { //square checker (little tricky move to check 9 field squares 3*3)
-        int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord
-        int sq_coord_y = input_y - input_y%3; //parse 0 or 3 or 6 from input coord
+    { //square checker
+        int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord X
+        int sq_coord_y = input_y - input_y%3; //parse 0 or 3 or 6 from input coord Y
         for (int inner_x = 0; inner_x < 3; inner_x++) //three times right from sq_coord_x
             for (int inner_y = 0; inner_y < 3; inner_y++) //three times down from sq_coord_y
-                if (number != 0)
+                if (number != 0) //why we need to check 0?
                     if (field.array[sq_coord_x + inner_x][sq_coord_y + inner_y] == number)
                         return false;
     }
@@ -95,15 +99,15 @@ void print(sudoku_t field)
 {
     int counterLine = 0;
     int counterCol = 0;
-    for (int i = 0; i < 9; i++)
+    for (int coord_x = 0; coord_x < 9; coord_x++)
     {
-        for (int j = 0; j < 9; j++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
         {
-            cout << field.array[i][j] << " ";
-            if (++counterCol%3 == 0) cout << "\t";
+            cout << field.array[coord_x][coord_y] << " ";
+            if (++counterCol % 3 == 0) cout << "\t"; //if printed 3 numbers in string do "\t"
         }
-        cout << endl;
-        if (++counterLine%3 == 0) cout << endl;
+        cout << endl; //if printed full string do "\n"
+        if (++counterLine%3 == 0) cout << endl; //if printed 3 strings do additional "\n"
     }
 }
 
@@ -111,11 +115,11 @@ int main()
 {
     srand(time(NULL));
     sudoku_t field;
+
     bool gen = true;
     while (gen)
-    {
         gen = generator(field);
-    }
+
     print(field);
 
     return 0;
