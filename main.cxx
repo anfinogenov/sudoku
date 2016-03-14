@@ -15,7 +15,7 @@ bool generator (sudoku_t & field);
 bool generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
 bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
 void print (sudoku_t field);
-bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
+bool uniqueCheck (sudoku_t field, int coord_x, int coord_y, int number);
 
 void fieldInit (sudoku_t & field)
 {
@@ -74,20 +74,20 @@ bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
     return !failure;
 }
 
-bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
+bool uniqueCheck(sudoku_t field, int coord_x, int coord_y, int number)
 //checks, if there are any contradictions with sudoku logic
 {
-    for (int coord_y = 0; coord_y < 9; coord_y++) //string checker
-        if (field.array[input_x][coord_y] == number) return false;
+    for (int inner_y = 0; inner_y < 9; inner_y++) //string checker
+        if (field.array[coord_x][inner_y] == number) return false;
         //if number already exists in string returns false;
 
-    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
-        if (field.array[coord_x][input_y] == number) return false;
+    for (int inner_x = 0; inner_x < 9; inner_x++) //string checker
+        if (field.array[inner_x][coord_y] == number) return false;
         //if number already exists in column returns false;
 
     { //square checker
-        int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord X
-        int sq_coord_y = input_y - input_y%3; //parse 0 or 3 or 6 from input coord Y
+        int sq_coord_x = coord_x - coord_x%3; //parse 0 or 3 or 6 from input coord X
+        int sq_coord_y = coord_y - coord_y%3; //parse 0 or 3 or 6 from input coord Y
         for (int inner_x = 0; inner_x < 3; inner_x++) //three times right from sq_coord_x
             for (int inner_y = 0; inner_y < 3; inner_y++) //three times down from sq_coord_y
                 if (number != 0) //why we need to check 0?
@@ -114,12 +114,11 @@ void print(sudoku_t field)
 int main()
 {
     srand(time(NULL));
-    sudoku_t field[1000];
+    sudoku_t field;
 
-    for (int i = 0; i < 1000; i++)
-        while (!generator(field[i])); //field generation complete when generator return true
+    while (!generator(field)); //field generation complete when generator return true
 
-    print(field[0]);
+    print(field);
 
     return 0;
 }
