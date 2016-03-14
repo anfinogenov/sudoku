@@ -16,6 +16,8 @@ bool generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y);
 bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y);
 void print (sudoku_t field);
 bool uniqueCheck (sudoku_t field, int input_x, int input_y, int number);
+bool strCheck (sudoku_t field, int coord_str, int number);
+bool colCheck (sudoku_t field, int coord_col, int number);
 
 void fieldInit (sudoku_t & field)
 {
@@ -54,10 +56,10 @@ bool generateSquare3x3 (sudoku_t & field, int sq_coord_x, int sq_coord_y)
                 field.array[coord_x][coord_y] = temp_rand;
                 inner_y++;
             }
-
             if (debug) { system("clear"); print(field); }
             //prints full field after every generation step
         }
+
     return true; //generation successful
 }
 
@@ -69,7 +71,7 @@ bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
     {
         failure = failure | uniqueCheck(field, coord_x, coord_y, numbers1to9[i]);
         //if there is no number in 1..9 that we can place, failure variable doesn't change and function returns !failure -> true
-        if (failure) break; //if there is exists at least 1 number in 1..9, stop loop and return false
+        if (failure) break; //if we found at least 1 number in 1..9, stop loop and return false
     }
     return !failure;
 }
@@ -77,13 +79,8 @@ bool generationFailureCheck (sudoku_t field, int coord_x, int coord_y)
 bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
 //checks, if there are any contradictions with sudoku logic
 {
-    for (int coord_y = 0; coord_y < 9; coord_y++) //string checker
-        if (field.array[input_x][coord_y] == number) return false;
-        //if number already exists in string input_x returns false;
-
-    for (int coord_x = 0; coord_x < 9; coord_x++) //column checker
-        if (field.array[coord_x][input_y] == number) return false;
-        //if number already exists in column input_y returns false;
+    if (!strCheck(field, input_x, number)) return false;
+    if (!colCheck(field, input_y, number)) return false;
 
     { //square checker
         int sq_coord_x = input_x - input_x%3; //parse 0 or 3 or 6 from input coord X
@@ -94,6 +91,22 @@ bool uniqueCheck(sudoku_t field, int input_x, int input_y, int number)
                     if (field.array[sq_coord_x + inner_x][sq_coord_y + inner_y] == number)
                         return false;
     }
+    return true;
+}
+
+bool strCheck (sudoku_t field, int coord_str, int number)
+{
+    for (int coord_y = 0; coord_y < 9; coord_y++) //string checker
+        if (field.array[coord_str][coord_y] == number) return false;
+        //if number already exists in string returns false;
+    return true;
+}
+
+bool colCheck (sudoku_t field, int coord_col, int number)
+{
+    for (int coord_x = 0; coord_x < 9; coord_x++) //string checker
+        if (field.array[coord_x][coord_col] == number) return false;
+        //if number already exists in column returns false;
     return true;
 }
 
@@ -114,11 +127,12 @@ void print(sudoku_t field)
 int main()
 {
     srand(time(NULL));
-    sudoku_t field;
+    sudoku_t field[1000];
 
-    while (!generator(field)); //field generation complete when generator return true
+    for (int i = 0; i < 1000; i++)
+        while (!generator(field[i])); //field generation complete when generator return true
 
-    print(field);
+    print(field[0]);
 
     return 0;
 }
