@@ -66,8 +66,6 @@ bool Sudoku::generateSquare3x3 (int sq_coord_x, int sq_coord_y) {
                 this->array[coord_x][coord_y] = temp_rand;
                 inner_y++;
             }
-            if (debug) { system("clear"); this->print(); }
-            //prints full field after every generation step
         }
     return true; //generation successful
 }
