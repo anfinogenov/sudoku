@@ -9,20 +9,19 @@ using namespace std;
 
 typedef struct Sudoku {
     int array[9][9];
-    bool generate (bool isNewField) { while(!generator(isNewField)); } //field generation complete when generator return true
+    bool generate () { while(!generator()); } //field generation complete when generator return true
     void init ();
     void parse_from_file (char* filename);
-    bool generator (bool isNewField);
+    bool generator ();
     bool generation_fail_chk (int coord_x, int coord_y);
     bool generate_3x3 (int sq_coord_x, int sq_coord_y);
     bool unique_check (int coord_x, int coord_y, int number);
     void print ();
+    bool solver ();
 } Sudoku;
 
 void Sudoku::init () {
-    for (int coord_x = 0; coord_x < 9; coord_x++)
-        for (int coord_y = 0; coord_y < 9; coord_y++)
-            this->array[coord_x][coord_y] = 0; // inits field with zeros
+
 }
 void Sudoku::parse_from_file (char* filename) {
     char temp;
@@ -34,7 +33,7 @@ void Sudoku::parse_from_file (char* filename) {
             fin >> temp;
             if (temp == '\n')
                 break;
-            this->array[i][j] = temp - '0'; //this will change code of symbol '1' to 1
+            this->array[i][j] = (int)(temp - '0'); //this will change code of symbol '1' to 1
             //'1' = 49, '2' = 50 etc
         }
 }
@@ -81,26 +80,30 @@ bool Sudoku::generate_3x3 (int sq_coord_x, int sq_coord_y) {
             if (this->generation_fail_chk(coord_x, coord_y))
                 return false; //generation failed
 
-            int temp_rand = rand()%9 + 1;
-            if (this->unique_check(coord_x, coord_y, temp_rand))
+            if (this->array[coord_x][coord_y] == 0)
             {
-                if (this->array[coord_x][coord_y] == 0)
+                int temp_rand = rand()%9 + 1;
+                if (this->unique_check(coord_x, coord_y, temp_rand))
+                {
                     this->array[coord_x][coord_y] = temp_rand;
-                inner_y++;
+                    inner_y++;
+                }
             }
         }
     return true; //generation successful
 }
-bool Sudoku::generator (bool isNewField) {
+bool Sudoku::generator () {
     //this function generates field by squares
 
-    if (isNewField) this->init();
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
+            this->array[coord_x][coord_y] = 0; // inits field with zeros
 
     //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
     for (int outer_x = 0; outer_x < 3; outer_x++)
         for (int outer_y = 0; outer_y < 3; outer_y++)
             if (!this->generate_3x3(outer_x*3, outer_y*3))
-            //if statement starts generate3x3 function, and if it returns false generator stops
+                //if statement starts generate3x3 function, and if it returns false generator stops
                 return false;
     return true;
 }
@@ -115,6 +118,19 @@ bool Sudoku::generation_fail_chk (int coord_x, int coord_y) {
     }
     return !failure;
 }
+bool Sudoku::solver () {
+    Sudoku temp_field;
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+        for (int coord_y = 0; coord_y < 9; coord_y++)
+            temp_field.array[coord_x][coord_y] = this->array[coord_x][coord_y];
+
+    for (int outer_x = 0; outer_x < 3; outer_x++)
+        for (int outer_y = 0; outer_y < 3; outer_y++)
+            if (!temp_field.generate_3x3(outer_x*3, outer_y*3))
+                return false;
+    *this = temp_field;
+    return true;
+}
 
 int main()
 {
@@ -122,11 +138,12 @@ int main()
 
     Sudoku field;
 
-    char filename[256] = "testfield.txt";
+    char filename[256] = "testfield2.txt";
     field.parse_from_file(filename);
 
-    //field.generate(true); //field generation complete when generator return true
+    //field.generate(); //field generation complete when generator return true
     //generate(true) because we generate new field
+    while(!field.solver());
     field.print();
 
     return 0;
