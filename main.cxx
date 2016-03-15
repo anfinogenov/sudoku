@@ -9,8 +9,7 @@ using namespace std;
 
 typedef struct Sudoku {
     int array[9][9];
-    bool generate () { while(!generator()); } //field generation complete when generator return true
-    void init ();
+    void generate () { while(!generator()); } //field generation complete when generator return true
     void parse_from_file (char* filename);
     bool generator ();
     bool generation_fail_chk (int coord_x, int coord_y);
@@ -20,22 +19,18 @@ typedef struct Sudoku {
     bool solver ();
 } Sudoku;
 
-void Sudoku::init () {
-
-}
 void Sudoku::parse_from_file (char* filename) {
-    char temp;
-    ifstream fin;
-    fin.open(filename);
+
+    ifstream fin(filename);
+    int temp;
+
     for (int i = 0 ; i < 9; i++)
         for (int j = 0; j < 9; j++)
         {
             fin >> temp;
-            if (temp == '\n')
-                break;
-            this->array[i][j] = (int)(temp - '0'); //this will change code of symbol '1' to 1
-            //'1' = 49, '2' = 50 etc
+            this->array[i][j] = temp;
         }
+    fin.close();
 }
 void Sudoku::print () {
     for (int coord_x = 0; coord_x < 9; coord_x++)
@@ -77,17 +72,18 @@ bool Sudoku::generate_3x3 (int sq_coord_x, int sq_coord_y) {
             int coord_x = sq_coord_x + inner_x;
             int coord_y = sq_coord_y + inner_y;
 
+            if (this->array[coord_x][coord_y] != 0) break;
+
             if (this->generation_fail_chk(coord_x, coord_y))
                 return false; //generation failed
 
-            if (this->array[coord_x][coord_y] == 0)
+            int temp_rand = rand()%9 + 1;
+
+            if (this->unique_check(coord_x, coord_y, temp_rand))
             {
-                int temp_rand = rand()%9 + 1;
-                if (this->unique_check(coord_x, coord_y, temp_rand))
-                {
-                    this->array[coord_x][coord_y] = temp_rand;
-                    inner_y++;
-                }
+                this->array[coord_x][coord_y] = temp_rand;
+                inner_y++;
+
             }
         }
     return true; //generation successful
@@ -138,7 +134,7 @@ int main()
 
     Sudoku field;
 
-    char filename[256] = "testfield2.txt";
+    char* filename = "/home/maxim/testfield2";
     field.parse_from_file(filename);
 
     //field.generate(); //field generation complete when generator return true
