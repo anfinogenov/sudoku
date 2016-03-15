@@ -2,22 +2,21 @@
 #include <ctime>
 #include <cstdlib>
 
-const bool debug = 0;
 const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 using namespace std;
 
 typedef struct Sudoku {
     int array[9][9];
-    bool generate() { while(!generator()); } //field generation complete when generator return true
-    bool generator();
+    bool generate () { while(!generator()); } //field generation complete when generator return true
+    bool generator ();
     bool generationFailureCheck (int coord_x, int coord_y);
     bool generateSquare3x3 (int sq_coord_x, int sq_coord_y);
-    bool uniqueCheck(int coord_x, int coord_y, int number);
-    void print();
+    bool uniqueCheck (int coord_x, int coord_y, int number);
+    void print ();
 } Sudoku;
 
-void Sudoku::print() {
+void Sudoku::print () {
     for (int coord_x = 0; coord_x < 9; coord_x++)
     {
         for (int coord_y = 0; coord_y < 9; coord_y++)
@@ -29,7 +28,7 @@ void Sudoku::print() {
         if (coord_x % 3 == 2) cout << endl; //if printed 3 strings do additional "\n"
     }
 }
-bool Sudoku::uniqueCheck(int coord_x, int coord_y, int number) {
+bool Sudoku::uniqueCheck (int coord_x, int coord_y, int number) {
     //checks, if there are any contradictions with sudoku logic
     for (int inner_y = 0; inner_y < 9; inner_y++) //string checker
         if (this->array[coord_x][inner_y] == number) return false;
@@ -102,13 +101,6 @@ int main()
     Sudoku field;
     field.generate(); //field generation complete when generator return true
     field.print();
-
-    if (debug) {
-        Sudoku field[100];
-        for(int i = 0; i < 100; i++)
-            field[i].generate(); //field generation complete when generator return true
-        field[0].print();
-    }
 
     return 0;
 }
