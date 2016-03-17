@@ -18,7 +18,7 @@ class Sudoku {
     public:
         void generate () { while(!generator()); } //field generation complete when generator return true
         void input_from_file (char* filename);
-        void print ();
+        void print (int output);
         bool solver ();
         Sudoku() {
             for (int coord_x = 0; coord_x < 9; coord_x++)
@@ -40,7 +40,7 @@ void Sudoku::input_from_file (char* filename) {
         }
     fin.close();
 }
-void Sudoku::print () {
+void Sudoku::print (int output) {
     for (int coord_x = 0; coord_x < 9; coord_x++)
     {
         for (int coord_y = 0; coord_y < 9; coord_y++)
@@ -91,13 +91,15 @@ bool Sudoku::generate_3x3 (int sq_coord_x, int sq_coord_y) {
             {
                 this->array[coord_x][coord_y] = temp_rand;
                 inner_y++;
-
             }
         }
     return true; //generation successful
 }
 bool Sudoku::generator () {
     //this function generates field by squares
+    for (int coord_x = 0; coord_x < 9; coord_x++)
+         for (int coord_y = 0; coord_y < 9; coord_y++)
+             this->array[coord_x][coord_y] = 0; // clears field
 
     //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
     for (int outer_x = 0; outer_x < 3; outer_x++)
@@ -124,17 +126,31 @@ bool Sudoku::solver () {
 
 namespace UI
 {
-    int user_choice () {
+    void user_welcome() {
+        cout << endl <<"Welcome to sudoku solver! " << version << endl;
+    }
+    int  user_mode_choice () {
         short choice;
         while (1)
         {
-            cout << "Welcome to sudoku solver! " << version << endl;
             cout << "Please choose mode:" << endl;
             cout << "1: solve sudoku with field from file" << endl;
             cout << "2: solve sudoku with field entered by keyboard" << endl;
             cout << "3: generate new field (without empty spaces)" << endl;
             cin >> choice;
-            if (choice == 1 || choice == 2 || choice == 3) break;
+            if (choice == 1 || choice == 2 || choice == 3) return choice;
+            cout << "Incorrect choice!" << endl;
+        }
+    }
+    int  user_output_choice () {
+        short choice;
+        while (1)
+        {
+            cout << "Please choose output mode:" << endl;
+            cout << "1: print on the screen" << endl;
+            cout << "2: print to the file" << endl;
+            cin >> choice;
+            if (choice == 1 || choice == 2) return choice;
             cout << "Incorrect choice!" << endl;
         }
     }
@@ -142,11 +158,23 @@ namespace UI
 
 int main()
 {
+    UI::user_welcome();
+
     srand(time(NULL));
-
     Sudoku field;
+    
+    int mode = UI::user_mode_choice();
+    int output = UI::user_output_choice();
 
-    int choice = UI::user_choice();
+    switch (mode) {
+        case 1:
+            break;
+        case 2:
+            break;
+        case 3:
+            field.generate();
+            break;
+    }
 
 
     //char* filename = "/home/maxim/testfield2";
@@ -155,7 +183,7 @@ int main()
     //field.generate(); //field generation complete when generator return true
     //generate(true) because we generate new field
     //while(!field.solver());
-    field.print();
+    field.print(output);
 
     return 0;
 }
