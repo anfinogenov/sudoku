@@ -3,23 +3,31 @@
 #include <ctime>
 #include <cstdlib>
 
-const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-
 using namespace std;
 
-typedef struct Sudoku {
-    int array[9][9];
-    void generate () { while(!generator()); } //field generation complete when generator return true
-    void parse_from_file (char* filename);
-    bool generator ();
-    bool generation_fail_chk (int coord_x, int coord_y);
-    bool generate_3x3 (int sq_coord_x, int sq_coord_y);
-    bool unique_check (int coord_x, int coord_y, int number);
-    void print ();
-    bool solver ();
-} Sudoku;
+const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+const string version = "v0.4alpha";
 
-void Sudoku::parse_from_file (char* filename) {
+class Sudoku {
+    private:
+        int array[9][9];
+        bool generator ();
+        bool generation_fail_chk (int coord_x, int coord_y);
+        bool generate_3x3 (int sq_coord_x, int sq_coord_y);
+        bool unique_check (int coord_x, int coord_y, int number);
+    public:
+        void generate () { while(!generator()); } //field generation complete when generator return true
+        void input_from_file (char* filename);
+        void print ();
+        bool solver ();
+        Sudoku() {
+            for (int coord_x = 0; coord_x < 9; coord_x++)
+                for (int coord_y = 0; coord_y < 9; coord_y++)
+                    this->array[coord_x][coord_y] = 0; // inits field with zeros
+        }
+};
+
+void Sudoku::input_from_file (char* filename) {
 
     ifstream fin(filename);
     int temp;
@@ -91,10 +99,6 @@ bool Sudoku::generate_3x3 (int sq_coord_x, int sq_coord_y) {
 bool Sudoku::generator () {
     //this function generates field by squares
 
-    for (int coord_x = 0; coord_x < 9; coord_x++)
-        for (int coord_y = 0; coord_y < 9; coord_y++)
-            this->array[coord_x][coord_y] = 0; // inits field with zeros
-
     //outer coords for 3*3 squares, inner coords for numbers inside, 3*3 too
     for (int outer_x = 0; outer_x < 3; outer_x++)
         for (int outer_y = 0; outer_y < 3; outer_y++)
@@ -115,17 +119,25 @@ bool Sudoku::generation_fail_chk (int coord_x, int coord_y) {
     return !failure;
 }
 bool Sudoku::solver () {
-    Sudoku temp_field;
-    for (int coord_x = 0; coord_x < 9; coord_x++)
-        for (int coord_y = 0; coord_y < 9; coord_y++)
-            temp_field.array[coord_x][coord_y] = this->array[coord_x][coord_y];
+    //rewrite this on new generator
+}
 
-    for (int outer_x = 0; outer_x < 3; outer_x++)
-        for (int outer_y = 0; outer_y < 3; outer_y++)
-            if (!temp_field.generate_3x3(outer_x*3, outer_y*3))
-                return false;
-    *this = temp_field;
-    return true;
+namespace UI
+{
+    int user_choice () {
+        short choice;
+        while (1)
+        {
+            cout << "Welcome to sudoku solver! " << version << endl;
+            cout << "Please choose mode:" << endl;
+            cout << "1: solve sudoku with field from file" << endl;
+            cout << "2: solve sudoku with field entered by keyboard" << endl;
+            cout << "3: generate new field (without empty spaces)" << endl;
+            cin >> choice;
+            if (choice == 1 || choice == 2 || choice == 3) break;
+            cout << "Incorrect choice!" << endl;
+        }
+    }
 }
 
 int main()
@@ -134,12 +146,15 @@ int main()
 
     Sudoku field;
 
-    char* filename = "/home/maxim/testfield2";
-    field.parse_from_file(filename);
+    int choice = UI::user_choice();
+
+
+    //char* filename = "/home/maxim/testfield2";
+    //field.parse_from_file(filename);
 
     //field.generate(); //field generation complete when generator return true
     //generate(true) because we generate new field
-    while(!field.solver());
+    //while(!field.solver());
     field.print();
 
     return 0;
