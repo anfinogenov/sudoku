@@ -18,7 +18,7 @@ class Sudoku {
     public:
         void generate () { while(!generator()); } //field generation complete when generator return true
         void input_from_file (char* filename);
-        void print (int output);
+        void print ();
         bool solver ();
         Sudoku() {
             for (int coord_x = 0; coord_x < 9; coord_x++)
@@ -40,7 +40,7 @@ void Sudoku::input_from_file (char* filename) {
         }
     fin.close();
 }
-void Sudoku::print (int output) {
+void Sudoku::print () {
     for (int coord_x = 0; coord_x < 9; coord_x++)
     {
         for (int coord_y = 0; coord_y < 9; coord_y++)
@@ -126,64 +126,40 @@ bool Sudoku::solver () {
 
 namespace UI
 {
-    void user_welcome() {
+    void welcome() {
         cout << endl <<"Welcome to sudoku solver! " << version << endl;
     }
-    int  user_mode_choice () {
-        short choice;
+    int input_choice()
+    {
+        int choice;
+        cout << "'1' for generation, '2' for solving\n";
         while (1)
         {
-            cout << "Please choose mode:" << endl;
-            cout << "1: solve sudoku with field from file" << endl;
-            cout << "2: solve sudoku with field entered by keyboard" << endl;
-            cout << "3: generate new field (without empty spaces)" << endl;
-            cin >> choice;
-            if (choice == 1 || choice == 2 || choice == 3) return choice;
-            cout << "Incorrect choice!" << endl;
-        }
-    }
-    int  user_output_choice () {
-        short choice;
-        while (1)
-        {
-            cout << "Please choose output mode:" << endl;
-            cout << "1: print on the screen" << endl;
-            cout << "2: print to the file" << endl;
+            cout << "1/2 ";
             cin >> choice;
             if (choice == 1 || choice == 2) return choice;
-            cout << "Incorrect choice!" << endl;
         }
     }
 }
 
 int main()
 {
-    UI::user_welcome();
+    UI::welcome();
 
     srand(time(NULL));
     Sudoku field;
-    
-    int mode = UI::user_mode_choice();
-    int output = UI::user_output_choice();
 
-    switch (mode) {
-        case 1:
-            break;
-        case 2:
-            break;
-        case 3:
-            field.generate();
-            break;
+    if (UI::input_choice() == 1) //generate
+    {
+        field.generate();
+        cout << "\nGeneration complete!\n";
+        field.print(); //TODO: change print method
+        //print(file) or print(screen)
     }
+    else //solve
+    {
 
-
-    //char* filename = "/home/maxim/testfield2";
-    //field.parse_from_file(filename);
-
-    //field.generate(); //field generation complete when generator return true
-    //generate(true) because we generate new field
-    //while(!field.solver());
-    field.print(output);
+    }
 
     return 0;
 }
