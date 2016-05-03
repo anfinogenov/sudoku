@@ -1,0 +1,7 @@
+need to rewrite solver on string generator
+it can be based on vector with available numbers for current point, so
+we need to randomly choose between numbers from vec.at(0) to vec.at(vec.size()-1)
+from this, we can add a logical condition - if vec is empty, we can't place anything in point
+and we need to return to basic field
+
+another idea is to not even try to place numbers in already occupied points (from input field)
