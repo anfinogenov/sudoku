@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include <cstdlib>
 
@@ -6,15 +7,28 @@ const int numbers1to9[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 using namespace std;
 
-typedef struct Sudoku {
-    int array[9][9];
-    bool generate () { while(!generator()); } //field generation complete when generator return true
-    bool generator ();
-    bool generationFailureCheck (int coord_x, int coord_y);
-    bool generateSquare3x3 (int sq_coord_x, int sq_coord_y);
-    bool uniqueCheck (int coord_x, int coord_y, int number);
-    void print ();
-} Sudoku;
+class Sudoku {
+    private:
+        int array[9][9];
+        int inputCopy[9][9];
+        bool fieldExists;
+        bool generationFailureCheck (int coord_x, int coord_y);
+        bool generateSquare3x3 (int sq_coord_x, int sq_coord_y);
+        bool generator_old ();
+        bool uniqueCheck (int coord_x, int coord_y, int number);
+    public:
+        Sudoku() {
+            for (int coord_x = 0; coord_x < 9; coord_x++)
+                for (int coord_y = 0; coord_y < 9; coord_y++)
+                    this->array[coord_x][coord_y] = 0; // inits field with zeros
+            this->fieldExists = false;
+            cout << "> created sudoku field object\n";
+        }
+        void generate () { while(!generator_old()); } //field generation complete when generator return true
+        void create_input_file();
+        void print ();
+        void solve ();
+};
 
 void Sudoku::print () {
     for (int coord_x = 0; coord_x < 9; coord_x++)
@@ -68,7 +82,7 @@ bool Sudoku::generateSquare3x3 (int sq_coord_x, int sq_coord_y) {
         }
     return true; //generation successful
 }
-bool Sudoku::generator () {
+bool Sudoku::generator_old () {
     //this function generates field by squares
     for (int coord_x = 0; coord_x < 9; coord_x++)
         for (int coord_y = 0; coord_y < 9; coord_y++)
@@ -93,13 +107,19 @@ bool Sudoku::generationFailureCheck (int coord_x, int coord_y) {
     }
     return !failure;
 }
+void Sudoku::create_input_file () {
+    ofstream fout("input.txt");
+    cout << "> created file \"input.txt\" in current directory\n";
+    fout.close();
+}
 
 int main()
 {
     srand(time(NULL));
 
     Sudoku field;
-    field.generate(); //field generation complete when generator return true
+    field.create_input_file();
+    field.generate();
     field.print();
 
     return 0;
